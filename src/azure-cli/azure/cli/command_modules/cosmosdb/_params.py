@@ -423,6 +423,10 @@ def load_arguments(self, _):
         c.argument('restore_location', options_list=['--restore-location', '-r'], help="The region of the restore.", required=True)
         c.argument('restore_timestamp_in_utc', options_list=['--restore-timestamp', '-t'], help="The timestamp of the restore", required=True)
 
+    # Account locations
+    with self.argument_context('cosmosdb locations show') as c:
+        c.argument('location', options_list=['--location', '-l'], help="Name of the location", required=True)
+
     # Managed Cassandra Cluster
     for scope in [
             'managed-cassandra cluster create',
@@ -510,3 +514,4 @@ def load_arguments(self, _):
     # Managed Cassandra Datacenter
     with self.argument_context('managed-cassandra datacenter list') as c:
         c.argument('cluster_name', options_list=['--cluster-name', '-c'], help="Cluster Name", required=True)
+

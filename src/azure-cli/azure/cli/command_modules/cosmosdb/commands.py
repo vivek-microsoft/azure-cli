@@ -24,6 +24,7 @@ from azure.cli.command_modules.cosmosdb._client_factory import (
     cf_restorable_mongodb_databases,
     cf_restorable_mongodb_collections,
     cf_restorable_mongodb_resources,
+    cf_db_locations,
     cf_cassandra_cluster,
     cf_cassandra_data_center
 )
@@ -112,6 +113,10 @@ def load_command_table(self, _):
     cosmosdb_mongodb_restorable_resources_sdk = CliCommandType(
         operations_tmpl='azure.mgmt.cosmosdb.operations#RestorableMongodbResourcesOperations.{}',
         client_factory=cf_restorable_mongodb_resources)
+
+    cosmosdb_locations_sdk = CliCommandType(
+        operations_tmpl='azure.mgmt.cosmosdb.operations#LocationsOperations.{}',
+        client_factory=cf_db_locations)
 
     cosmosdb_managed_cassandra_cluster_sdk = CliCommandType(
         operations_tmpl='azure.mgmt.cosmosdb.operations#CassandraClustersOperations.{}',
@@ -371,6 +376,11 @@ def load_command_table(self, _):
         g.command('list', 'list')
 
     with self.command_group('cosmosdb mongodb restorable-resource', cosmosdb_mongodb_restorable_resources_sdk, client_factory=cf_restorable_mongodb_resources) as g:
+        g.command('list', 'list')
+
+    # Get account locations
+    with self.command_group('cosmosdb locations', cosmosdb_locations_sdk, client_factory=cf_db_locations) as g:
+        g.show_command('show', 'get')
         g.command('list', 'list')
 
     # Retrieve backup info for sql
