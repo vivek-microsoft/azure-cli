@@ -24,6 +24,7 @@ from azure.cli.command_modules.cosmosdb._client_factory import (
     cf_restorable_mongodb_databases,
     cf_restorable_mongodb_collections,
     cf_restorable_mongodb_resources,
+    cf_db_locations,
     cf_cassandra_cluster,
     cf_cassandra_data_center
 )
@@ -112,6 +113,10 @@ def load_command_table(self, _):
     cosmosdb_mongodb_restorable_resources_sdk = CliCommandType(
         operations_tmpl='azure.mgmt.cosmosdb.operations#RestorableMongodbResourcesOperations.{}',
         client_factory=cf_restorable_mongodb_resources)
+
+    cosmosdb_locations_sdk = CliCommandType(
+        operations_tmpl='azure.mgmt.cosmosdb.operations#LocationsOperations.{}',
+        client_factory=cf_db_locations)
 
     cosmosdb_managed_cassandra_cluster_sdk = CliCommandType(
         operations_tmpl='azure.mgmt.cosmosdb.operations#CassandraClustersOperations.{}',
@@ -373,9 +378,18 @@ def load_command_table(self, _):
     with self.command_group('cosmosdb mongodb restorable-resource', cosmosdb_mongodb_restorable_resources_sdk, client_factory=cf_restorable_mongodb_resources) as g:
         g.command('list', 'list')
 
-    # Retrieve backup info
-    with self.command_group('cosmosdb sql', cosmosdb_sql_sdk, client_factory=cf_sql_resources, is_preview=True) as g:
-        g.custom_command('retrieve-latest-backup-time', 'cli_retrieve_latest_backup_time')
+    # Get account locations
+    with self.command_group('cosmosdb locations', cosmosdb_locations_sdk, client_factory=cf_db_locations) as g:
+        g.show_command('show', 'get')
+        g.command('list', 'list')
+
+    # Retrieve backup info for sql
+    with self.command_group('cosmosdb sql container', cosmosdb_sql_sdk, client_factory=cf_sql_resources) as g:
+        g.custom_command('retrieve-latest-backup-time', 'cli_sql_retrieve_latest_backup_time')
+
+    # Retrieve backup info for mongodb
+    with self.command_group('cosmosdb mongodb collection', cosmosdb_mongo_sdk, client_factory=cf_mongo_db_resources) as g:
+        g.custom_command('retrieve-latest-backup-time', 'cli_mongo_db_retrieve_latest_backup_time')
 
     # managed cassandra cluster
     with self.command_group('managed-cassandra cluster', cosmosdb_managed_cassandra_cluster_sdk, client_factory=cf_cassandra_cluster) as g:
@@ -396,3 +410,4 @@ def load_command_table(self, _):
         g.command('list', 'list')
         g.show_command('show', 'get')
         g.command('delete', 'begin_delete', confirmation=True, supports_no_wait=True)
+
